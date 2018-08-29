@@ -24,7 +24,22 @@
     <Folder Include="images\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Asteroid.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Asteroids.py" />
+    <Compile Include="FlyingObject.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Bullet.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Leviathon.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ship.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Velocity.py">
       <SubType>Code</SubType>
     </Compile>

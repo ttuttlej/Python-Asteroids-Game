@@ -1,4 +1,3 @@
-
 class Velocity():
     """
     Class: Velocity

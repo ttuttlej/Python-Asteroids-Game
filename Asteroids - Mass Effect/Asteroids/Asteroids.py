@@ -7,10 +7,12 @@ This program implements the asteroids game.
 import arcade
 import random
 import math
-from abc import ABC
-from abc import abstractmethod
+#from abc import ABC
+#from abc import abstractmethod
 import Point
 import Velocity
+import Ship
+import Bullet
 
 # These are Global constants to use throughout the game
 SCREEN_WIDTH = 800
@@ -20,348 +22,26 @@ BULLET_RADIUS = 30
 BULLET_SPEED = 10
 BULLET_LIFE = 60
 
-SHIP_TURN_AMOUNT = 3
-SHIP_THRUST_AMOUNT = 0.25
-SHIP_RADIUS = 30
-INVINCIBILITY_LIFE = 200
+#SHIP_TURN_AMOUNT = 3
+#SHIP_THRUST_AMOUNT = 0.25
+#SHIP_RADIUS = 30
+#INVINCIBILITY_LIFE = 200
 
 INITIAL_ROCK_COUNT = 5
 
-BIG_ROCK_SPIN = 1
-BIG_ROCK_SPEED = 1.5
-BIG_ROCK_RADIUS = 15
+#BIG_ROCK_SPIN = 1
+#BIG_ROCK_SPEED = 1.5
+#BIG_ROCK_RADIUS = 15
 
-MEDIUM_ROCK_SPIN = -2
-MEDIUM_ROCK_RADIUS = 5
+#MEDIUM_ROCK_SPIN = -2
+#MEDIUM_ROCK_RADIUS = 5
 
-SMALL_ROCK_SPIN = 5
-SMALL_ROCK_RADIUS = 2
+#SMALL_ROCK_SPIN = 5
+#SMALL_ROCK_RADIUS = 2
 
-LEVIATHAN_RADIUS = 70
-LEVIATHAN_SPEED = .5
+#LEVIATHAN_RADIUS = 70
+#LEVIATHAN_SPEED = .5
 
-#class Point():
-#    """
-#    Class: Point 
-#    Purpose: Holds the coordinate values for the location of items on the screen
-#    """
-#    def __init__(self):
-#        self.x = 0
-#        self.y = 0
-
-#class Velocity():
-#    """
-#    Class: Velocity
-#    Purpose: Holds the values for how fast moving objects will move in each direction
-#    """
-#    def __init__(self):
-#        self.dx = 0
-#        self.dy = 0
-
-class Flying_Object(ABC):
-    """
-    Class: Flying_object
-    Purpose: Contains information relevant to ALL obejcts that move across the screen
-    """
-    def __init__(self):
-        self.center = Point.Point()
-        self.velocity = Velocity.Velocity()
-        self.radius = 0
-        self.angle = 0
-        self.alive = True
-
-    def advance(self):
-        """
-        Moves the target across the screen
-        """    
-        self.center.x = self.center.x + self.velocity.dx
-        self.center.y = self.center.y + self.velocity.dy
-
-    @abstractmethod # All objects must be drawn to the screen
-    def draw(self):
-        pass
- 
-    def calculate_velocity(self, speed):
-        """
-        Breaks RESULTANT velocity into components relative to its current angle of 
-        direction and adds them to the objects velocity components
-        param: the RESULTATNT velocity of the object who's velocity components are being 
-               calculated must be passed along with object
-               (please initialize contstant RESULTATNT velocities at the top)
-        """
-        self.velocity.dx += math.cos(math.radians(self.angle)) * speed
-        self.velocity.dy += math.sin(math.radians(self.angle)) * speed
-    
-    def wrap(self):
-        """
-        Check each object to see if it has left the screen.
-        If it has, put it on the other side of the screen.
-        """
-        if self.center.x > SCREEN_WIDTH:
-            self.center.x = 0
-        if self.center.y > SCREEN_HEIGHT:
-            self.center.y = 0
-        if self.center.x < 0:
-            self.center.x = SCREEN_WIDTH
-        if self.center.y < 0:
-            self.center.y = SCREEN_HEIGHT
-
-class Ship(Flying_Object):
-    """
-    Class: Ship
-    Purpose: Contains all information related to the ship including: 
-            (Ship controls, drawing to screen)
-    """
-    def __init__(self):
-        super().__init__()
-        self.invincibility_life = INVINCIBILITY_LIFE 
-        self.invincible = False
-        self.radius = SHIP_RADIUS
-        self.ship_begin()
-            
-    def ship_begin(self):
-        # Starts the ship at the center of the screen
-        self.center.x = SCREEN_WIDTH/2
-        self.center.y = SCREEN_HEIGHT/2
-        
-    def throttle(self):
-        # Increases the velocity of the ship in the direction its facing
-        self.calculate_velocity(SHIP_THRUST_AMOUNT)
-    
-    def apply_brake(self):
-        # Decreases velocity of the ship
-        self.calculate_velocity(-SHIP_THRUST_AMOUNT)
-
-    def turn_left(self):
-        # Turns the ship left at a certain angular velocity(SHIP_TURN_AMOUNT)
-        self.angle += SHIP_TURN_AMOUNT
-
-    def turn_right(self):
-        self.angle -= SHIP_TURN_AMOUNT
-
-    def draw(self):
-        # Load the image of the ship from the images folder
-        img = "images/NormandySR2flattened.png"
-        texture = arcade.load_texture(img)
-
-        width = 150
-        height = 100
-        alpha = 1 # For transparency, 1 means not transparent
-
-        x = self.center.x
-        y = self.center.y
-        angle = self.angle - 90 # Shift the unit cirlce 90 degrees
-        arcade.draw_texture_rectangle(x, y, width, height, texture, angle, alpha)
-
-    def draw_invincibility(self):
-        # Load the image of the ship from the images folder
-        self.invincibility_life -= 1
-
-        if self.invincibility_life == 0:
-            self.invincible = False
-
-        img = "images/normandy - teal.png"
-        texture = arcade.load_texture(img)
-
-        width = 150
-        height = 100
-        alpha = 1 # For transparency, 1 means not transparent
-
-        x = self.center.x
-        y = self.center.y
-        angle = self.angle - 90 # Shift the unit cirlce 90 degrees
-        arcade.draw_texture_rectangle(x, y, width, height, texture, angle, alpha)
-
-
-class Bullet(Flying_Object):
-    """
-    Class: Bullet
-    Purpose: Contains information relevant only to the bullets
-    """
-    def __init__(self):
-        super().__init__()
-        self.frames_to_live = BULLET_LIFE
-        self.radius = BULLET_RADIUS
-
-    def fire(self, ship):
-        """
-        Sets bullet location and velocity to the same location and velocity of the Ship
-        Param: Ship object 
-              (must be passed from the game class; this is where the ship object is created)
-        """
-        self.center.x = ship.center.x
-        self.center.y = ship.center.y
-        self.angle = ship.angle
-        self.velocity.dx = ship.velocity.dx
-        self.velocity.dy = ship.velocity.dy
-        self.calculate_velocity(BULLET_SPEED)
-
-    def draw(self):
-        img = "images/laserBlue01.png"
-        texture = arcade.load_texture(img)
-
-        width = texture.width
-        height = texture.height
-        alpha = 1 # For transparency, 1 means not transparent
-
-        x = self.center.x
-        y = self.center.y
-        angle = self.angle
-        arcade.draw_texture_rectangle(x, y, width, height, texture, angle, alpha)   
-
-    def advance(self):
-        super().advance()
-
-        # Bullets only live for a select number of frames
-        # Once the bullet runs out of lives, kill it
-        self.frames_to_live -= 1
-        if self.frames_to_live == 0:
-            self.alive = False
-
-class Asteroid(Flying_Object):
-    def __init__(self):
-        super().__init__()
-        self.rotation_angle = 0
-        self.asteroid_begin()
-
-    def asteroid_begin(self):
-        """
-        Sets each asteroid to a random location.
-        This is done outside of the init function to allow for a future
-            implementation of restarting the game
-        """
-        self.center.x = random.uniform(0, SCREEN_WIDTH)
-        self.center.y = random.uniform(0, SCREEN_HEIGHT)
-        self.angle = random.uniform(0, 360)
-
-    def spin(self):
-        # This rotates the asteroid at the specified angular velocity
-        self.rotation_angle += self.spin_amount
-
-    @abstractmethod # Every asteroid reacts differently when shot
-    def break_apart(self, list_of_asteriods):
-        pass
-
-class Large_Asteroid(Asteroid):
-    def __init__(self):
-        super().__init__()
-        self.spin_amount = BIG_ROCK_SPIN
-        self.large_asteroid_begin()                      
-        self.radius = BIG_ROCK_RADIUS
-
-
-    def large_asteroid_begin(self):
-        """
-        After location and angle have been chosen randomly, calculate
-        the velocity the objects will travel at.
-        """
-        self.calculate_velocity(BIG_ROCK_SPEED)
-
-    def draw(self):   
-        img = "images/asteroid-icon.png"
-        texture = arcade.load_texture(img)
-
-        width = 140
-        height = 140
-        alpha = 1 # For transparency, 1 means not transparent
-
-        x = self.center.x
-        y = self.center.y
-        self.spin()
-        angle = self.rotation_angle
-        arcade.draw_texture_rectangle(x, y, width, height, texture, angle, alpha)
-
-    def break_apart(self, list_of_asteroids):
-        """
-        KIlls the Large ateroid and replaces it with 2 medium asteroids and a small one
-        """
-        self.alive = False
-        medium_asteroid = Medium_Asteroid()
-        medium_asteroid.velocity.dy = self.velocity.dy + 2
-        list_of_asteroids.append(medium_asteroid)
-        medium_asteroid = Medium_Asteroid()
-        medium_asteroid.velocity.dy = self.velocity.dy - 2
-        list_of_asteroids.append(medium_asteroid)
-        small_asteroid = Small_Asteroid()
-        small_asteroid.velocity.dx = self.velocity.dx + 5
-        list_of_asteroids.append(small_asteroid)
-
-class Medium_Asteroid(Asteroid):
-    def __init__(self):
-        super().__init__()
-        self.spin_amount = MEDIUM_ROCK_RADIUS
-        self.radius = MEDIUM_ROCK_RADIUS
-
-    def draw(self):
-        img = "images/asteroid-icon.png"
-        texture = arcade.load_texture(img)
-
-        width = 90
-        height = 90
-        alpha = 1 # For transparency, 1 means not transparent
-
-        x = self.center.x
-        y = self.center.y
-        self.spin()
-        angle = self.rotation_angle
-        arcade.draw_texture_rectangle(x, y, width, height, texture, angle, alpha)
-
-    def break_apart(self, list_of_asteroids):
-        self.alive = False
-        small_asteroid = Small_Asteroid()
-        small_asteroid.velocity.dy = self.velocity.dy + 1.5
-        small_asteroid.velocity.dx = self.velocity.dx + 1.5
-        list_of_asteroids.append(small_asteroid)
-        small_asteroid = Small_Asteroid()
-        small_asteroid.velocity.dy = self.velocity.dy - 1.5
-        small_asteroid.velocity.dx = self.velocity.dx - 1.5
-        list_of_asteroids.append(small_asteroid)
-        
-class Small_Asteroid(Asteroid):
-    def __init__(self):
-        super().__init__()
-        self.spin_amount = SMALL_ROCK_SPIN
-        self.radius = SMALL_ROCK_RADIUS
-
-    def draw(self):
-        img = "images/asteroid-icon.png"
-        texture = arcade.load_texture(img)
-
-        width = 65
-        height = 65
-        alpha = 1 # For transparency, 1 means not transparent
-
-        x = self.center.x
-        y = self.center.y
-        self.spin()
-        angle = self.rotation_angle
-        arcade.draw_texture_rectangle(x, y, width, height, texture, angle, alpha)
-
-    def break_apart(self, list_of_asteroids):
-        self.alive = False
-
-class Leviathan(Flying_Object):
-    def __init__(self):
-        super().__init__()
-        self.radius = LEVIATHAN_RADIUS
-        self.angle = 0
-        self.center.x = SCREEN_WIDTH/2
-        self.center.y = SCREEN_HEIGHT + 500
-        self.velocity.dy = -LEVIATHAN_SPEED
-
-    def draw(self):
-        img = "images/Leviathan.png"
-        texture = arcade.load_texture(img)
-
-        width = 700
-        height = 700
-        alpha = 1 # For transparency, 1 means not transparent
-
-        x = self.center.x
-        y = self.center.y
-        
-        angle = self.angle
-        arcade.draw_texture_rectangle(x, y, width, height, texture, angle, alpha)
 
 class Game(arcade.Window):
     """
@@ -393,7 +73,7 @@ class Game(arcade.Window):
             asteroid = Large_Asteroid()
             self.asteroids.append(asteroid)
         self.bullets = []
-        self.ship = Ship()
+        self.ship = Ship.Ship()
         self.gameOver = False
 
     def background(self):
@@ -539,7 +219,7 @@ class Game(arcade.Window):
 
             if key == arcade.key.SPACE:
                 # TODO: Fire the bullet here!
-                bullet = Bullet()
+                bullet = Bullet.Bullet()
                 bullet.fire(self.ship)
                 self.bullets.append(bullet)
 
