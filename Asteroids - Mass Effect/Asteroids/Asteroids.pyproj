@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>851b73c3-c5d7-4244-b788-99481f76f952</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Asteroids.py</StartupFile>
+    <StartupFile>Game (Main).py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -27,13 +27,13 @@
     <Compile Include="Asteroid.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Asteroids.py" />
     <Compile Include="FlyingObject.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Bullet.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Game %28Main%29.py" />
     <Compile Include="Leviathon.py">
       <SubType>Code</SubType>
     </Compile>

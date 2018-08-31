@@ -1,4 +1,6 @@
-import FlyingObject
+from FlyingObject import FlyingObject
+import arcade
+
 
 LEVIATHAN_RADIUS = 70
 LEVIATHAN_SPEED = .5
@@ -6,7 +8,7 @@ LEVIATHAN_SPEED = .5
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-class Leviathan(Flying_Object):
+class Leviathan(FlyingObject):
     def __init__(self):
         super().__init__()
         self.radius = LEVIATHAN_RADIUS

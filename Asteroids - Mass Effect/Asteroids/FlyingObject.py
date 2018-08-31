@@ -1,14 +1,20 @@
+import math
 from abc import ABC
 from abc import abstractmethod
+from Velocity import Velocity
+from Point import Point
 
-class Flying_Object(ABC):
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+class FlyingObject(ABC):
     """
     Class: Flying_object (BASE CLASS)
     Purpose: Contains information relevant to ALL obejcts that move across the screen
     """
     def __init__(self):
-        self.center = Point.Point()
-        self.velocity = Velocity.Velocity()
+        self.center = Point()
+        self.velocity = Velocity()
         self.radius = 0
         self.angle = 0
         self.alive = True

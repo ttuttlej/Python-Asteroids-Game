@@ -1,4 +1,7 @@
-import FlyingObject
+import arcade
+import random
+from FlyingObject import FlyingObject
+from abc import abstractmethod
 
 BIG_ROCK_SPIN = 1
 BIG_ROCK_SPEED = 1.5
@@ -13,8 +16,7 @@ SMALL_ROCK_RADIUS = 2
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-
-class Asteroid(Flying_Object):
+class Asteroid(FlyingObject):
     def __init__(self):
         super().__init__()
         self.rotation_angle = 0

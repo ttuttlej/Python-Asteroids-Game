@@ -1,4 +1,5 @@
-import FlyingObject
+from FlyingObject import FlyingObject
+import arcade
 
 SHIP_TURN_AMOUNT = 3
 SHIP_THRUST_AMOUNT = 0.25

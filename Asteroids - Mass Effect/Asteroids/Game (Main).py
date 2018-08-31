@@ -1,46 +1,28 @@
 """
-File: asteroids.py
-Original Author: Br. Burton
-Designed to be completed by others
-This program implements the asteroids game.
+Author: Jason Tuttle
+This is the main file that creates the game world and
+starts the game.
 """
 import arcade
 import random
 import math
-#from abc import ABC
-#from abc import abstractmethod
-import Point
-import Velocity
-import Ship
-import Bullet
+from abc import ABC
+from abc import abstractmethod
+from Point import Point
+from Velocity import Velocity
+from Ship import Ship
+from Bullet import Bullet
+from FlyingObject import FlyingObject
+from Leviathon import Leviathan
+from Asteroid import Large_Asteroid
+from Asteroid import Medium_Asteroid
+from Asteroid import Small_Asteroid
 
 # These are Global constants to use throughout the game
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-BULLET_RADIUS = 30
-BULLET_SPEED = 10
-BULLET_LIFE = 60
-
-#SHIP_TURN_AMOUNT = 3
-#SHIP_THRUST_AMOUNT = 0.25
-#SHIP_RADIUS = 30
-#INVINCIBILITY_LIFE = 200
-
 INITIAL_ROCK_COUNT = 5
-
-#BIG_ROCK_SPIN = 1
-#BIG_ROCK_SPEED = 1.5
-#BIG_ROCK_RADIUS = 15
-
-#MEDIUM_ROCK_SPIN = -2
-#MEDIUM_ROCK_RADIUS = 5
-
-#SMALL_ROCK_SPIN = 5
-#SMALL_ROCK_RADIUS = 2
-
-#LEVIATHAN_RADIUS = 70
-#LEVIATHAN_SPEED = .5
 
 
 class Game(arcade.Window):
@@ -73,7 +55,7 @@ class Game(arcade.Window):
             asteroid = Large_Asteroid()
             self.asteroids.append(asteroid)
         self.bullets = []
-        self.ship = Ship.Ship()
+        self.ship = Ship()
         self.gameOver = False
 
     def background(self):
@@ -219,7 +201,7 @@ class Game(arcade.Window):
 
             if key == arcade.key.SPACE:
                 # TODO: Fire the bullet here!
-                bullet = Bullet.Bullet()
+                bullet = Bullet()
                 bullet.fire(self.ship)
                 self.bullets.append(bullet)
 

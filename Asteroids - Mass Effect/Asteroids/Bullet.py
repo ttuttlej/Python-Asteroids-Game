@@ -1,4 +1,10 @@
-import FlyingObject
+from FlyingObject import FlyingObject
+import arcade
+from Ship import Ship
+
+BULLET_RADIUS = 30
+BULLET_SPEED = 10
+BULLET_LIFE = 60
 
 class Bullet(FlyingObject):
     """
